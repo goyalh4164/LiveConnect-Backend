@@ -61,8 +61,7 @@ export const userLogout = async (req, res, next) => {
 
 export const userDetails = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    if (!id) next(new customErrorHandler(500, "Internal Server Error"));
+    const id=req.UserID;
     const resp = await userDetailsRepo(id);
     if (resp.success) {
       res.json({ success: true, user: resp.user });

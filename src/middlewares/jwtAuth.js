@@ -22,7 +22,7 @@ export const auth = async (req, res, next) => {
     if (!user) {
       return res.status(401).json({ error: "Unauthorized! Invalid token." });
     }
-
+    req.UserID = decoded._id;
     req.token = token;
     req.user = user;
     next();
