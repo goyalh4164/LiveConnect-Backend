@@ -1,7 +1,11 @@
-import app from "./index.js";
-import { connectToDb } from "./src/config/db.js";
 
-app.listen(8000, async () => {
+import app from "./index.js";
+import { connectToDb } from './src/config/db.js';
+
+const PORT = 8000;
+
+
+app.listen(PORT, async () => {
   await connectToDb();
-  console.log("Server is live at PORT 8000");
+  console.log(`Server is live at PORT ${PORT}`);
 });
