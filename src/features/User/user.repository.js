@@ -4,6 +4,7 @@ import {
   compareHashedPassword,
   hashPassword,
 } from "../../utils/hashPassword.js";
+import { v4 as uuidv4 } from "uuid"; // Import uuid for generating unique roomIds
 
 export const userRegisterationRepo = async (userData) => {
   try {
@@ -135,30 +136,51 @@ export const allUserDetailsRepo = async (userId, name) => {
   }
 };
 
+
 export const addFriendRepo = async (userID, id) => {
   try {
     const friendUser = await UserModel.findById(id);
     if (!friendUser)
       return {
         success: false,
-        error: { statusCode: 404, msg: "user not found" },
+        error: { statusCode: 404, msg: 'user not found' },
       };
+
     const loggedInUser = await UserModel.findById(userID);
-    friendUser.friends.push(new mongoose.Types.ObjectId(userID));
-    loggedInUser.friends.push(new mongoose.Types.ObjectId(id));
+
+    // Generate a unique roomId using uuid
+    const roomId = uuidv4();
+
+    // Update friends array with user, name, and roomId
+    friendUser.friends.push({
+      user: new mongoose.Types.ObjectId(userID),
+      name: loggedInUser.name, // Add the name of the logged-in user
+      roomId,
+    });
+
+    loggedInUser.friends.push({
+      user: new mongoose.Types.ObjectId(id),
+      name: friendUser.name, // Add the name of the friend user
+      roomId,
+    });
+
+    // Save changes to both users
     await friendUser.save();
     await loggedInUser.save();
+
     return {
       success: true,
       message: `${friendUser.name} is added to your friends List`,
+      roomId, // Return roomId for reference if needed
     };
   } catch (error) {
     return {
       success: false,
-      error: { statusCode: 500, msg: error.message || "Internal Server Error" },
+      error: { statusCode: 500, msg: error.message || 'Internal Server Error' },
     };
   }
 };
+
 export const getFriendsRepo = async (userID) => {
   try {
     const loggedInUser = await UserModel.findById(userID);
@@ -168,15 +190,11 @@ export const getFriendsRepo = async (userID) => {
         error: { statusCode: 404, msg: "User not found" },
       };
 
-    // Populate the friends array with user IDs and names
-    const friendsWithNames = await UserModel.find(
-      { _id: { $in: loggedInUser.friends } },
-      { _id: 1, name: 1 }
-    );
-
-    const friends = friendsWithNames.map((friend) => ({
-      id: friend._id,
+    // Extract the desired fields from friends array
+    const friends = loggedInUser.friends.map((friend) => ({
+      id: friend.user,
       name: friend.name,
+      roomID: friend.roomId,
     }));
 
     return {

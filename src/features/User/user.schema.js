@@ -20,8 +20,12 @@ const userSchema = new mongoose.Schema({
   },
   friends: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      name: String,
+      roomId: String,  // Change the type to String
     },
   ],
 });
