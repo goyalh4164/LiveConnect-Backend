@@ -2,11 +2,16 @@ import http from 'http';
 import { Server } from 'socket.io';
 import app from './index.js';
 import { connectToDb } from './src/config/db.js';
-
 const PORT = 8000;
 
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server,{
+  cors: {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    credentials: true,
+  },
+});
 
 // Socket.io connection event
 io.on('connection', (socket) => {
