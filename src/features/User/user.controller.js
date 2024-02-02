@@ -37,7 +37,7 @@ export const userLogin = async (req, res, next) => {
         expiresIn: "1h",
       });
 
-      res.json({ success: true, msg: "User login successful", token,name:resp.res.name });
+      res.json({ success: true, msg: "User login successful", token,name:resp.res.name,id:resp.res._id });
     } else {
       if (resp.error.statusCode) {
         next(new customErrorHandler(resp.error.statusCode, resp.error.msg));
