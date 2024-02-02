@@ -3,6 +3,7 @@ import {
   userDetailsRepo,
   userLoginRepo,
   userRegisterationRepo,
+  allUserDetailsRepo
 } from "./user.repository.js";
 import { customErrorHandler } from "../../utils/errorHandler.js";
 import { hashPassword } from "../../utils/hashPassword.js";
@@ -58,10 +59,9 @@ export const userLogout = async (req, res, next) => {
   }
 };
 
-
 export const userDetails = async (req, res, next) => {
   try {
-    const id=req.UserID;
+    const id = req.UserID;
     const resp = await userDetailsRepo(id);
     if (resp.success) {
       res.json({ success: true, user: resp.user });
@@ -94,7 +94,27 @@ export const updateUserDetails = async (req, res, next) => {
       }
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
+    next(new customErrorHandler(500, "Internal Server Error"));
+  }
+};
+
+export const allUsers = async (req, res, next) => {
+  try {
+    const id = req.UserID;
+    const { name } = req.params;
+    const resp = await allUserDetailsRepo(id, name);
+    if (resp.success) {
+      res.json({ success: true, users: resp.users });
+    } else {
+      if (resp.error.statusCode) {
+        next(new customErrorHandler(resp.error.statusCode, resp.error.msg));
+      } else {
+        next(new customErrorHandler(500, "Internal Server Error"));
+      }
+    }
+  } catch (error) {
+    console.log(error);
     next(new customErrorHandler(500, "Internal Server Error"));
   }
 };

@@ -17,7 +17,6 @@ export const userRegisterationRepo = async (userData) => {
   }
 };
 
-
 export const userLoginRepo = async (userData) => {
   try {
     const { email, password } = userData;
@@ -82,12 +81,12 @@ export const userDetailsRepo = async (id) => {
 
 export const updateUserDetailsRepo = async (userId, updatedData) => {
   try {
-    let hashedPassword='';
+    let hashedPassword = "";
     if (updatedData.password) {
       hashedPassword = await hashPassword(updatedData.password);
     }
     let finalUpdatedData = updatedData;
-    if(hashedPassword!=''){
+    if (hashedPassword != "") {
       finalUpdatedData = { ...updatedData, password: hashedPassword };
     }
 
@@ -109,3 +108,30 @@ export const updateUserDetailsRepo = async (userId, updatedData) => {
     };
   }
 };
+
+export const allUserDetailsRepo = async (userId, name) => {
+  try {
+    const users = await UserModel.aggregate([
+      {
+        $match: {
+          _id: { $ne: new mongoose.Types.ObjectId(userId) },
+          name: { $regex: new RegExp(name, 'i') }, // Case-insensitive substring match
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+        },
+      },
+    ]);
+
+    return { success: true, users };
+  } catch (error) {
+    return {
+      success: false,
+      error: { statusCode: 500, msg: error.message || "Internal Server Error" },
+    };
+  }
+};
+
