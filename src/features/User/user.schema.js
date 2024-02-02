@@ -18,6 +18,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["male", "female", "non-binary"],
   },
+  friends: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
 });
 
 const UserModel = mongoose.model("User", userSchema);
