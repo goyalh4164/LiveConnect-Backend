@@ -159,3 +159,29 @@ export const addFriendRepo = async (userID, id) => {
     };
   }
 };
+export const getFriendsRepo = async (userID) => {
+  try {
+    const loggedInUser = await UserModel.findById(userID);
+    if (!loggedInUser)
+      return {
+        success: false,
+        error: { statusCode: 404, msg: "User not found" },
+      };
+
+    // Populate the friends array with user names
+    const friendsWithNames = await UserModel.find(
+      { _id: { $in: loggedInUser.friends } },
+      { _id: 1, name: 1 }
+    );
+
+    return {
+      success: true,
+      friends: friendsWithNames.map((friend) => friend.name),
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: { statusCode: 500, msg: error.message || "Internal Server Error" },
+    };
+  }
+};

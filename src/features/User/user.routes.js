@@ -6,7 +6,8 @@ import {
   userLogout,
   userRegisteration,
   allUsers,
-  addFriend
+  addFriend,
+  getFriends
 } from "./user.controller.js";
 import { auth } from "../../middlewares/jwtAuth.js";
 
@@ -19,5 +20,6 @@ router.get("/get-details/", auth, userDetails);
 router.put("/update-details/:id", auth, updateUserDetails);
 router.get("/get-all-users/:name",auth,allUsers)
 router.post("/add-friend/:id",auth,addFriend)
+router.get("/user-friends",auth,getFriends);
 
 export default router;

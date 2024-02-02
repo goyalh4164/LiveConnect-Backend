@@ -4,7 +4,8 @@ import {
   userLoginRepo,
   userRegisterationRepo,
   allUserDetailsRepo,
-  addFriendRepo
+  addFriendRepo,
+  getFriendsRepo
 } from "./user.repository.js";
 import { customErrorHandler } from "../../utils/errorHandler.js";
 import { hashPassword } from "../../utils/hashPassword.js";
@@ -128,6 +129,25 @@ export const addFriend = async (req,res,next)=>{
     if (resp.success) {
       const name = resp.name;
       res.json({ success: true, message:resp.message});
+    } else {
+      if (resp.error.statusCode) {
+        next(new customErrorHandler(resp.error.statusCode, resp.error.msg));
+      } else {
+        next(new customErrorHandler(500, "Internal Server Error"));
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    next(new customErrorHandler(500, "Internal Server Error"));
+  }
+}
+export const getFriends = async (req,res,next)=>{
+  try {
+    
+    const UserID = req.UserID;
+    const resp = await getFriendsRepo(UserID);
+    if (resp.success) {
+      res.json({ success: true, friends:resp.friends});
     } else {
       if (resp.error.statusCode) {
         next(new customErrorHandler(resp.error.statusCode, resp.error.msg));
