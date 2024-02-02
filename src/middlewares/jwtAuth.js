@@ -3,7 +3,7 @@ import UserModel from "../features/User/user.schema.js";
 
 export const auth = async (req, res, next) => {
   const authorizationHeader = req.headers.authorization;
-  console.log(authorizationHeader)
+  // console.log(authorizationHeader)
   if (!authorizationHeader) {
     return res.status(401).json({ error: "Unauthorized! Bearer token missing." });
   }
