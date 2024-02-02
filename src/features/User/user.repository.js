@@ -168,15 +168,20 @@ export const getFriendsRepo = async (userID) => {
         error: { statusCode: 404, msg: "User not found" },
       };
 
-    // Populate the friends array with user names
+    // Populate the friends array with user IDs and names
     const friendsWithNames = await UserModel.find(
       { _id: { $in: loggedInUser.friends } },
       { _id: 1, name: 1 }
     );
 
+    const friends = friendsWithNames.map((friend) => ({
+      id: friend._id,
+      name: friend.name,
+    }));
+
     return {
       success: true,
-      friends: friendsWithNames.map((friend) => friend.name),
+      friends,
     };
   } catch (error) {
     return {
