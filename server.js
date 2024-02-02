@@ -31,8 +31,8 @@ io.on('connection', (socket) => {
   // Handle messages
   socket.on('message', (data) => {
     console.log('Message:', data);
-    // Broadcast the message to all connected clients in the room
-    io.to(userRooms.get(socket.id)).emit('message', data);
+    // Broadcast the message to all connected clients in the room excluding the sender
+    socket.to(userRooms.get(socket.id)).emit('message', data);
   });
 
   // Disconnect event
