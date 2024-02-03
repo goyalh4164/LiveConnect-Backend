@@ -2,6 +2,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import app from './index.js';
 import { connectToDb } from './src/config/db.js';
+import Message from './src/features/Messages/message.schema.js';
 
 const PORT = 8000;
 
@@ -38,16 +39,28 @@ io.on('connection', (socket) => {
   });
 
   // Handle messages
-  socket.on('message', (data) => {
-    console.log(socket.id);
-    console.log('Message:', data);
+  // Import the Message model
+ // Update the path accordingly
 
-    const roomID = data.roomID;
+socket.on('message', async (data) => {
+  console.log(socket.id);
+  console.log('Message:', data);
+  const { senderID, receiverID, message } = data;
 
+  // Save the message to MongoDB
+  try {
+    const savedMessage = await Message.findOneAndUpdate(
+      { senderID, receiverID },
+      { $push: { messages: message } },
+      { upsert: true, new: true }
+    );
+    console.log('Message saved to MongoDB:', savedMessage);
+
+    // Broadcast the message to all sockets in the room
+    const roomID = data.roomID; // Assuming roomID is still part of the data
     if (roomSocketIDsMap.has(roomID)) {
       const socketIDsInRoom = roomSocketIDsMap.get(roomID);
 
-      // Broadcast the message to all sockets in the room
       socketIDsInRoom.forEach((socketID) => {
         // Skip sending the message to the sender
         if (socketID !== socket.id) {
@@ -55,7 +68,11 @@ io.on('connection', (socket) => {
         }
       });
     }
-  });
+  } catch (error) {
+    console.error('Error saving message to MongoDB:', error);
+  }
+});
+
 
   // Disconnect event
   socket.on('disconnect', () => {
