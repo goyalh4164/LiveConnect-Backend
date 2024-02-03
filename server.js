@@ -2,7 +2,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import app from './index.js';
 import { connectToDb } from './src/config/db.js';
-import Message from './src/features/Messages/message.schema.js';
+import MessageModel from './src/features/Messages/message.schema.js';
 
 const PORT = 8000;
 
@@ -42,18 +42,27 @@ io.on('connection', (socket) => {
   // Import the Message model
  // Update the path accordingly
 
-socket.on('message', async (data) => {
+ socket.on('message', async (data) => {
   console.log(socket.id);
   console.log('Message:', data);
   const { senderID, receiverID, message } = data;
 
   // Save the message to MongoDB
   try {
-    const savedMessage = await Message.findOneAndUpdate(
-      { senderID, receiverID },
-      { $push: { messages: message } },
+    const savedMessage = await MessageModel.findOneAndUpdate(
+      {
+        participants: {
+          $elemMatch: { $in: [senderID, receiverID] },
+        },
+      },
+      {
+        $set: { participants: [senderID, receiverID] },
+        $push: { messages: { userID: senderID, content: message } },
+      },
       { upsert: true, new: true }
     );
+    
+    
     console.log('Message saved to MongoDB:', savedMessage);
 
     // Broadcast the message to all sockets in the room
