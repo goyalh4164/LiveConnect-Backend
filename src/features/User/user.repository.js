@@ -143,10 +143,22 @@ export const addFriendRepo = async (userID, id) => {
     if (!friendUser)
       return {
         success: false,
-        error: { statusCode: 404, msg: 'user not found' },
+        error: { statusCode: 404, msg: 'User not found' },
       };
 
     const loggedInUser = await UserModel.findById(userID);
+
+    // Check if users are already friends
+    const areAlreadyFriends = loggedInUser.friends.some(
+      (friend) => friend.user.toString() === id
+    );
+
+    if (areAlreadyFriends) {
+      return {
+        success: false,
+        error: { statusCode: 400, msg: 'You are already friends' },
+      };
+    }
 
     // Generate a unique roomId using uuid
     const roomId = uuidv4();
@@ -170,7 +182,7 @@ export const addFriendRepo = async (userID, id) => {
 
     return {
       success: true,
-      message: `${friendUser.name} is added to your friends List`,
+      message: `${friendUser.name} is added to your friends list`,
       roomId, // Return roomId for reference if needed
     };
   } catch (error) {
@@ -180,6 +192,7 @@ export const addFriendRepo = async (userID, id) => {
     };
   }
 };
+
 
 export const getFriendsRepo = async (userID) => {
   try {
