@@ -1,16 +1,17 @@
 import dotenv from "dotenv";
 dotenv.config();
-import cors from 'cors';
+import cors from "cors";
 import express from "express";
 import userRouter from "./src/features/User/user.routes.js";
+import messageRouter from "./src/features/Messages/message.routes.js";
 import { appLevelErrorHandlerMiddleware } from "./src/utils/errorHandler.js";
 const app = express();
 
 app.use(express.json());
 // Configuring cors middleware
 const corsOptions = {
-  origin: 'http://localhost:3000', // Specify the exact origin
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  origin: "http://localhost:3000", // Specify the exact origin
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 204,
 };
@@ -19,6 +20,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use("/api/users/", userRouter);
+app.use("/api/messages/", messageRouter);
 app.get("/", (req, res) => {
   res.send("Welcome to liveConnect Backend");
 });
