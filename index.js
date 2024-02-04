@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 // Configuring cors middleware
 const corsOptions = {
-  origin: "http://localhost:3000", // Specify the exact origin
+  origin: "https://darling-daffodil-e52521.netlify.app", // Specify the exact origin
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 204,
