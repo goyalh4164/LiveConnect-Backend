@@ -51,9 +51,30 @@ io.on('connection', (socket) => {
   try {
     const savedMessage = await MessageModel.findOneAndUpdate(
       {
-        participants: {
-          $elemMatch: { $in: [senderID, receiverID] },
-        },
+        $or: [
+          {
+            participants: {
+              $elemMatch: { $eq: senderID },
+            },
+          },
+          {
+            participants: {
+              $elemMatch: { $eq: receiverID },
+            },
+          },
+        ],
+        $and: [
+          {
+            participants: {
+              $elemMatch: { $eq: senderID },
+            },
+          },
+          {
+            participants: {
+              $elemMatch: { $eq: receiverID },
+            },
+          },
+        ],
       },
       {
         $set: { participants: [senderID, receiverID] },
@@ -61,6 +82,7 @@ io.on('connection', (socket) => {
       },
       { upsert: true, new: true }
     );
+    
     
     
     console.log('Message saved to MongoDB:', savedMessage);
